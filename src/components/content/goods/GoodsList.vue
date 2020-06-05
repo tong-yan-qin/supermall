@@ -5,6 +5,7 @@
   </div>
 </template>
 
+
 <script>
 import GoodsListItem from './GoodsListItem'
 export default {
