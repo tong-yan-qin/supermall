@@ -1,6 +1,6 @@
 <template>
-  <div class="goods-item">
-      <img :src="goodsItem.show.img"   alt="">
+  <div class="goods-item" @click="itemClick">
+      <img :src="goodsItem.show.img" alt="" @load="imageLoad">
       <div class="goods-info">
         <p>{{goodsItem.title}}</p>
         <span class="price">{{goodsItem.price}}</span>
@@ -12,16 +12,35 @@
 <script>
 export default {
   name: "GoodsListItem",
-  props: {
+  props: {//从goodlist拿数据
       goodsItem: {
         type: Object,
         default() {
           return {
-
           }
         }
       }
     },
+    //监听图片的加载
+    methods:{
+      imageLoad () {
+        //要拿到scroll的东西即非父子之间的通信，不可以直接要间接的拿方法一
+        this.$bus.$emit('itemImageLoad')
+        //因为$bus是空的东西，所以需要加东西，而加东西则是需要通过原型
+        //方法二是通过vuex来拿
+
+      },
+      //监听事件的点击 路由跳转 并且拿到id
+     itemClick() {
+        this.$router.push('/detail/' + this.goodsItem.iid)
+        // this.$router.push({
+        //   path: '/detail',
+        //   query: {
+            
+        //   }
+        // })
+      } 
+    }
 }
 </script>
 

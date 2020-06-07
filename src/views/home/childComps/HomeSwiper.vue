@@ -2,7 +2,7 @@
   <swiper>
      <swiper-item   :key="item" v-for="item in banners">
        <a :href="item.link">
-         <img :src="item.image" alt="">
+         <img :src="item.image" alt="" @load="imageLoad">
        </a>
      </swiper-item>
    </swiper> 
@@ -20,9 +20,23 @@ export default {
            }
        }
    },
+   data() {//只出现一次，而不是出现四次
+     return {
+       isLoad: false
+     }
+   },
    components: {
        Swiper,
        SwiperItem
+   },
+   methods: {
+     imageLoad() {
+       if(!this.isLoad){
+        this.$emit('swiperImageLoad') 
+        this.isLoad = true
+       }
+      
+     }
    }
 }
 </script>
