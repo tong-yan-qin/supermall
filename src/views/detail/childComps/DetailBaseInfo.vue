@@ -13,7 +13,7 @@
       <span>{{goods.services[goods.services.length-1].name}}</span>
     </div>
     <div class="info-service">
-      <span class="info-service-item" v-for="index in goods.services.length-1" :key="index">
+      <span class="info-service-item" v-for="index in goods.services.length-1" :key="index.id">
         <img :src="goods.services[index-1].icon">
         <!-- 下标从1开始所以 需要减去1 从零开始 -->
         <span>{{goods.services[index-1].name}}</span>

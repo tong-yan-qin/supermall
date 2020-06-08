@@ -1,15 +1,17 @@
 <template>
   <div id="detail">
-    <detail-nav-bar class="detail-nav"></detail-nav-bar>
+    <detail-nav-bar class="detail-nav" @itemClick="itemClick"
+                    ref="nav"></detail-nav-bar>
+
     <scroll class="content" ref="scroll">   
        <!-- 有固定的高度 -->
       <detail-swiper :top-images="topImages"></detail-swiper>
       <detail-base-info :goods=" goods"></detail-base-info>
       <detail-shop-info :shop="shop"></detail-shop-info>
       <detail-goods-info :detailInfo="detailInfo" @imageLoad="imageLoad"></detail-goods-info>
-      <detail-param-info :paramInfo="paramInfo"></detail-param-info>
-      <detail-comment-info :comment-info="commentInfo"></detail-comment-info>
-      <goods-list :goods="recommends"></goods-list>
+      <detail-param-info :paramInfo="paramInfo" ref="param"></detail-param-info>
+      <detail-comment-info :comment-info="commentInfo" ref="comment"></detail-comment-info>
+      <goods-list :goods="recommends" ref="recommend"></goods-list>
     
     </scroll>
 
@@ -25,8 +27,10 @@
  import DetailParamInfo from './childComps/DetailParamInfo'
  import DetailCommentInfo from './childComps/DetailCommentInfo'
  import GoodsList from 'components/content/goods/GoodsList'
- 
+ import {debounce} from "common/utils"
+
  import Scroll from 'components/common/scroll/Scroll'
+
 
  import {getDetail, Goods, Shop, GoodsParam,getRecommend} from "network/detail";
 
@@ -55,7 +59,9 @@
         detailInfo: {},
         paramInfo: {},
         commentInfo: {},
-        recommends: []
+        recommends: [],
+        themeTopYs: [],
+        getThemeTopY:null
      }
     
      
@@ -77,16 +83,37 @@
      })
 
      getRecommend().then(res => {
-       console.log(res)
+      //  console.log(res)
        this.recommends =res.data.list
      })
+
+       //给getThemeTopY 赋值
+        this.getThemeTopY = debounce(() => {
+        this.themeTopYs = [];
+        this.themeTopYs.push(0);
+        this.themeTopYs.push(this.$refs.param.$el.offsetTop)
+        this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
+        this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+        // this.themeTopYs.push(Number.MAX_SAFE_INTEGER);
+
+        console.log(this.themeTopYs);
+      },100)
+   
  },
   methods: {
        imageLoad() {
-          this.$refs.scroll.refresh()
-       }
-     }
+        this.$refs.scroll.refresh()
+       //给getThemeTopY 赋值
+       this.getThemeTopY()
+      
+       },
+        itemClick(index){
+      this.$refs.scroll.scrollTo(0, -this.themeTopYs[index], 200);
+        
+ },
 
+     },
+     
 }
 </script>
 
@@ -95,7 +122,7 @@
    position: relative;
    background-color: #fff;
     height: 100vh;
-    z-index: 1;
+    z-index: 9;
  }
  .content {
   height: calc(100% - 44px);
@@ -103,7 +130,7 @@
  }
  .detail-nav {
    position: relative;
-   z-index: 999;
+   z-index: 9;
    background-color: #fff;
  }
 </style>
