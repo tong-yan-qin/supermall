@@ -35,7 +35,7 @@
   </div>
 </template>
 
-<script>
+<script scoped>
 	export default {
 		name: "DetailShopInfo",
     props: {
@@ -56,7 +56,7 @@
 </script>
 
 <style scoped>
-  .shop-info {
+ .shop-info {
     padding: 25px 8px;
     border-bottom: 5px solid #f2f5f8;
   }

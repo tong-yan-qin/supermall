@@ -43,24 +43,17 @@ export default {
 }
 </script>
 
-<style>
-.nav-bar {
-    position: relative;
-    z-index: 9;
-    background-color: #fff;
+<style scoped>
+.title{
+    display: flex; 
 }
-.title {
-    display: flex;
-    font-size: 12px;
-}
-.title-item {
+.title-item{
     flex: 1;
 }
-.active {
-    color: var (--color-high-text);
+.active{
+    color: red;
 }
-.back img {
-  margin-top: 10px;
-    
+.back img{
+    margin-top: 12px;
 }
 </style>

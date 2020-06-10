@@ -3,17 +3,25 @@
     <detail-nav-bar class="detail-nav" @itemClick="itemClick"
                     ref="nav"></detail-nav-bar>
 
-    <scroll class="content" ref="scroll">   
+    <scroll 
+      class="content" 
+      ref="scroll"
+      :probe-type="3" 
+      @scroll="contentScroll">   
        <!-- 有固定的高度 -->
       <detail-swiper :top-images="topImages"></detail-swiper>
-      <detail-base-info :goods=" goods"></detail-base-info>
+      <detail-base-info :goods="goods"></detail-base-info>
       <detail-shop-info :shop="shop"></detail-shop-info>
+
       <detail-goods-info :detailInfo="detailInfo" @imageLoad="imageLoad"></detail-goods-info>
+      
       <detail-param-info :paramInfo="paramInfo" ref="param"></detail-param-info>
       <detail-comment-info :comment-info="commentInfo" ref="comment"></detail-comment-info>
-      <goods-list :goods="recommends" ref="recommend"></goods-list>
-    
+      <goods-list :goods="recommends" ref="recommend"></goods-list> 
     </scroll>
+   <detail-bottom-bar @addToCart="addToCart"></detail-bottom-bar>
+     <back-top @click.native="backTop" 
+       v-show="isShowBackTop"></back-top>
 
   </div>
 </template>
@@ -27,6 +35,9 @@
  import DetailParamInfo from './childComps/DetailParamInfo'
  import DetailCommentInfo from './childComps/DetailCommentInfo'
  import GoodsList from 'components/content/goods/GoodsList'
+ import DetailBottomBar from './childComps/DetailBottomBar'
+
+import BackTop from 'components/content/backTop/BackTop'
  import {debounce} from "common/utils"
 
  import Scroll from 'components/common/scroll/Scroll'
@@ -46,7 +57,9 @@
       DetailGoodsInfo,
       DetailParamInfo,
       DetailCommentInfo,
-      GoodsList
+      GoodsList,
+      DetailBottomBar,
+      BackTop
       },
  data() {
    //保存id
@@ -61,7 +74,9 @@
         commentInfo: {},
         recommends: [],
         themeTopYs: [],
-        getThemeTopY:null
+        getThemeTopY:null,
+        currentIndex:0,
+        isShowBackTop: false,
      }
     
      
@@ -75,6 +90,7 @@
        this.goods =new Goods(data.itemInfo,data.columns,data.shopInfo.services)
        this.shop = new Shop(data.shopInfo)
        this.detailInfo = data.detailInfo
+       console.log(this.detailInfo)
        this.paramInfo = new GoodsParam(data.itemParams.info, data.itemParams.rule)
        //取评论信息
        if(data.rate.cRate !== 0){
@@ -95,8 +111,8 @@
         this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
         this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
         // this.themeTopYs.push(Number.MAX_SAFE_INTEGER);
-
-        console.log(this.themeTopYs);
+        this.themeTopYs.push(Number.MAX_VALUE);
+        // console.log(this.themeTopYs);
       },100)
    
  },
@@ -107,30 +123,87 @@
        this.getThemeTopY()
       
        },
-        itemClick(index){
+      itemClick(index){
       this.$refs.scroll.scrollTo(0, -this.themeTopYs[index], 200);
         
  },
+      backTop(){
+        this.$refs.scroll.scrollTo(0,0)
+        //监听点击事件
+       
+     },
+     addToCart() {
+        // 1.获取信息
+      const product = {};
+      product.image = this.topImages[0];
+      product.title = this.goods.title;
+      product.desc = this.goods.desc;
+      product.price = this.goods.realPrice;
+      product.iid = this.iid;
+      //添加购物npm车
+      //  this.$store.commit('addCart',product)
+      this.$store.dispatch('addCart',product)
+     },
+      contentScroll(position) {
+         this.isShowBackTop = (-position.y) > 1000
+        const positionY = -position.y
+        const length = this.themeTopYs.length
+      //   for(let i=0;i<this.themeTopYs.length;i++) {
+      //      console.log(i)
+      //   if(positionY >this.themeTopYs[i] &&positionY  <this.themeTopYs[i+1] ) {
+      //     // console.log(i)
+      //   }
+      //  }
+      // for( let i=0 ; i<length ;i++){
+      //   if(this.currentIndex !== i 
+      //   &&(i < length-1
+      //   && positionY >this.themeTopYs[i]
+      //   && positionY < this.themeTopYs[i+1])
+      //   ||(i===length-1 && positionY >=this.themeTopYs[i])){          this.currentIndex = i
+      //   //  console.log(i)
+      //   this.$refs.nav.currentIndex = this.currentIndex
+      // }
+      // }
+      for( let i=0 ; i<length-1 ;i++){
+       if(this.currentIndex !== i &&(positionY >=this.themeTopYs[i]&& positionY < this.themeTopYs[i+1])){
+         this.currentIndex = i
+        //  console.log(this.currentIndex)
+         this.$refs.nav.currentIndex = this.currentIndex
+
+
+        }
+       
+      }
 
      },
      
-}
+  }
+ }
 </script>
 
-<style>
- #detail{
-   position: relative;
-   background-color: #fff;
-    height: 100vh;
+<style scoped>
+ #detail {
+  height: 100vh;
+  position: relative;
+  }
+
+  .content {
+  overflow: hidden;
+ position: absolute;
+ top:44px;
+ bottom: 49px;
+ left:0;
+ right: 0;
+  }
+  .detail-nav{
+    position: relative;
     z-index: 9;
- }
- .content {
-  height: calc(100% - 44px);
-  background-color: #fff;
- }
- .detail-nav {
-   position: relative;
-   z-index: 9;
-   background-color: #fff;
- }
+    background: #fff;
+  }
+
+  .back-top {
+    position: fixed;
+    right: 10px;
+    bottom: 65px;
+  }
 </style>

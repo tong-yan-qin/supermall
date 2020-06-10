@@ -1,7 +1,7 @@
 <template>
 <!-- ref拿子组件 -->
-  <div class="wrapper" ref="wrapper">
-      <div class="content">
+  <div ref="wrapper">
+      <div >
          <slot></slot>
       </div>
   </div>
@@ -30,7 +30,8 @@ export default {
  },
  mounted() {
     // 1创建对象 document.querySelector('.wrapper')拿取的wrapper目标不明确
-     this.scroll = new BScroll(this.$refs.wrapper,{
+   if (!this.$refs.wrapper) return
+  this.scroll = new BScroll(this.$refs.wrapper,{
          click: true,
          probeType: this.probeType,
          pullUpLoad: this.pullUpLoad //监听滚到底部
@@ -69,7 +70,12 @@ export default {
     getScrollY() {
       return this.scroll ? this.scroll.y : 0
     }
- }
+ },
+//      watch: {
+//     data() {
+//       setTimeout(this.refresh, 20)
+//     }  
+//  }
 }
 </script>
 
